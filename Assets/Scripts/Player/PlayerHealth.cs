@@ -2,6 +2,7 @@
 using UnityEngine.UI;
 using System.Collections;
 using UnityEngine.SceneManagement;
+using UnityEngine.InputSystem.XR.Haptics;
 
 
 public class PlayerHealth : MonoBehaviour
@@ -13,8 +14,10 @@ public class PlayerHealth : MonoBehaviour
     public AudioClip deathClip;
     public float flashSpeed = 5f;
     public Color flashColour = new Color(1f, 0f, 0f, 0.1f);
+    PlayerShooting playerShooting;
 
 
+    Animator anim;
     AudioSource playerAudio;
     PlayerMovement playerMovement;
     //PlayerShooting playerShooting;
@@ -27,8 +30,9 @@ public class PlayerHealth : MonoBehaviour
 
         playerAudio = GetComponent<AudioSource>();
         playerMovement = GetComponent<PlayerMovement>();
-        //playerShooting = GetComponentInChildren <PlayerShooting> ();
+        playerShooting = GetComponentInChildren<PlayerShooting>();
         currentHealth = startingHealth;
+        anim = GameObject.FindGameObjectWithTag("Player").GetComponent<Animator>();
     }
 
 
@@ -67,7 +71,7 @@ public class PlayerHealth : MonoBehaviour
     {
         isDead = true;
 
-        //playerShooting.DisableEffects ();
+        playerShooting.DisableEffects();
 
         anim.SetTrigger("Die");
 
@@ -75,7 +79,7 @@ public class PlayerHealth : MonoBehaviour
         playerAudio.Play();
 
         playerMovement.enabled = false;
-        //playerShooting.enabled = false;
+        playerShooting.enabled = false; //so easy
     }
 
 

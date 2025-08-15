@@ -5,8 +5,8 @@ public class PlayerShooting : MonoBehaviour
     public int damagePerShot = 20;
     public float timeBetweenBullets = 0.15f;
     public float range = 100f;
-
-
+    [SerializeField] bool Sniper = false;
+    [SerializeField] bool Burst = false;
     float timer;
     Ray shootRay = new Ray();
     RaycastHit shootHit;
@@ -27,14 +27,44 @@ public class PlayerShooting : MonoBehaviour
         gunLight = GetComponent<Light> ();
     }
 
-
+    bool canFire = true;
     void Update ()
     {
         timer += Time.deltaTime;
 
 		if(Input.GetButton ("Fire1") && timer >= timeBetweenBullets && Time.timeScale != 0)
         {
-            Shoot ();
+            if (Burst)
+            {
+                damagePerShot = 15;
+                timeBetweenBullets = 0.35f;
+                Shoot();
+                for (int i = 0; i < 2; i++)
+                {
+                    if (canFire)
+                    {
+
+                        canFire = false;
+                        Invoke(nameof(Shoot), 0.1f);
+                    }
+
+                }
+            }
+            else if (Sniper)
+            {
+                timeBetweenBullets = 1.5f;
+                damagePerShot = 100;
+                Shoot();
+            }
+
+            else
+            {
+                damagePerShot = 20;
+                timeBetweenBullets = 0.2f;
+                Shoot();
+            }
+            
+            
         }
 
         if(timer >= timeBetweenBullets * effectsDisplayTime)
@@ -68,18 +98,20 @@ public class PlayerShooting : MonoBehaviour
         shootRay.origin = transform.position;
         shootRay.direction = transform.forward;
 
-        if(Physics.Raycast (shootRay, out shootHit, range, shootableMask))
+        if (Physics.Raycast(shootRay, out shootHit, range, shootableMask))
         {
-            EnemyHealth enemyHealth = shootHit.collider.GetComponent <EnemyHealth> ();
-            if(enemyHealth != null)
+            EnemyHealth enemyHealth = shootHit.collider.GetComponent<EnemyHealth>();
+            if (enemyHealth != null)
             {
-                enemyHealth.TakeDamage (damagePerShot, shootHit.point);
+                enemyHealth.TakeDamage(damagePerShot, shootHit.point);
             }
-            gunLine.SetPosition (1, shootHit.point);
+            gunLine.SetPosition(1, shootHit.point);
+            canFire = true;
         }
+
         else
         {
-            gunLine.SetPosition (1, shootRay.origin + shootRay.direction * range);
+            gunLine.SetPosition(1, shootRay.origin + shootRay.direction * range);
         }
     }
 }
